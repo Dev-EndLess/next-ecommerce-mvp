@@ -2,7 +2,7 @@
 import db from "@/db/db";
 import { z } from "zod";
 import fs from "fs/promises";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 const fileSchema = z.instanceof(File, { message: "File is required" });
 const imageSchema = fileSchema.refine(
@@ -24,7 +24,7 @@ const addSchema = z.object({
   }),
 });
 
-export async function AddProduct(formData: FormData) {
+export async function AddProduct(prevState: unknown, formData: FormData) {
   const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!result.success) {
     return result.error.formErrors.fieldErrors;
@@ -42,6 +42,7 @@ export async function AddProduct(formData: FormData) {
 
   await db.product.create({
     data: {
+      isAvailableForPurchase: false,
       name: data.name,
       description: data.description,
       priceInCents: data.priceInCents,
@@ -51,4 +52,16 @@ export async function AddProduct(formData: FormData) {
   });
 
   redirect("/admin/products");
+}
+
+export async function toggleProductAvailability(id: string, isAvailableForPurchase: boolean) {
+  await db.product.update({ where: { id }, data: { isAvailableForPurchase } });
+}
+
+export async function deleteProduct(id: string) {
+  const product = await db.product.delete({ where: { id } });
+  if(product === null) return notFound()
+
+  await fs.unlink(product.filePath)
+  await fs.unlink(`public/${product.imagePath}`)
 }

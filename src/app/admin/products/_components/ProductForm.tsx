@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/formatters";
 import { useState } from "react";
-import { AddProduct } from "../../actions/Products";
+import { AddProduct } from "../../actions/products";
 import { useFormState, useFormStatus } from "react-dom";
 
 export function ProductForm() {
@@ -64,7 +64,7 @@ export function ProductForm() {
           <p className="text-destructive">{error.image}</p>
         )}
       </div>
-      <Button type="submit">Save</Button>
+      <SubmitButton />
     </form>
   );
 }
