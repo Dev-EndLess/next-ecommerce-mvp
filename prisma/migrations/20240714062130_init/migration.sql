@@ -4,7 +4,7 @@ CREATE TABLE "Product" (
     "name" TEXT NOT NULL,
     "priceInCents" INTEGER NOT NULL,
     "filePath" TEXT NOT NULL,
-    "imgPath" TEXT NOT NULL,
+    "imagePath" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "isAvailableForPurchase" BOOLEAN NOT NULL DEFAULT true,
     "createAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
