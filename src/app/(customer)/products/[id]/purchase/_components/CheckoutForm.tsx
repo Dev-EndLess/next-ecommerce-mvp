@@ -1,5 +1,6 @@
 "use client";
 
+import { userOrderExist } from "@/app/(customer)/actions/order";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +13,7 @@ import {
 import { formatCurrency } from "@/lib/formatters";
 import {
   Elements,
+  LinkAuthenticationElement,
   PaymentElement,
   useElements,
   useStripe,
@@ -22,6 +24,7 @@ import { FormEvent, useState } from "react";
 
 type CheckoutFormProps = {
   product: {
+    id: string
     imagePath: string;
     name: string;
     priceInCents: number;
@@ -58,28 +61,45 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
       </div>
 
       <Elements options={{ clientSecret }} stripe={stripePromise}>
-        <Form priceInCents={product.priceInCents} />
+        <Form priceInCents={product.priceInCents} productId={product.id} />
       </Elements>
     </div>
   );
 }
 
-function Form({ priceInCents }: { priceInCents: number }) {
+function Form({
+  priceInCents,
+  productId,
+}: {
+  priceInCents: number;
+  productId: string;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
+  const [email, setEmail] = useState<string>();
 
   const paymentElementOptions = {
     layout: "tabs" as "tabs",
   };
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (stripe == null || elements == null) return;
+    if (stripe == null || elements == null || email == null) return;
 
     setIsLoading(true);
+
+    const orderExists = await userOrderExist(email, productId);
+
+    if (orderExists) {
+      setErrorMessage(
+        "You already purchased this product. Try downloading it from the My Order page"
+      );
+      setIsLoading(false);
+      return;
+    }
 
     // Check for exiting order
     stripe
@@ -109,7 +129,10 @@ function Form({ priceInCents }: { priceInCents: number }) {
           )}
         </CardHeader>
         <CardContent>
-          <PaymentElement options={paymentElementOptions} />;
+          <PaymentElement options={paymentElementOptions} />
+          <LinkAuthenticationElement
+            onChange={(e) => setEmail(e.value.email)}
+          />
         </CardContent>
         <Button
           className="w-full"
