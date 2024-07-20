@@ -13,17 +13,23 @@ export default async function SuccessPage({
 }: {
   searchParams: { payment_intent: string };
 }) {
-  const payment_intent = await stripe.paymentIntents.retrieve(searchParams.payment_intent);
-  if(payment_intent.metadata.productId == null) return notFound();
+  const payment_intent = await stripe.paymentIntents.retrieve(
+    searchParams.payment_intent
+  );
+  if (payment_intent.metadata.productId == null) return notFound();
 
-  const product = await db.product.findUnique({ where: { id: payment_intent.metadata.productId } });
+  const product = await db.product.findUnique({
+    where: { id: payment_intent.metadata.productId },
+  });
   if (product == null) return notFound();
 
   const isSuccess = payment_intent.status === "succeeded";
 
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
-      <h1 className="text-4xl font-bold">{isSuccess ? "Success!" : "Error!"}</h1>
+      <h1 className="text-4xl font-bold">
+        {isSuccess ? "Success!" : "Error!"}
+      </h1>
       <div className="flex gap-4 items-center">
         <div className="aspect-video flex-shrink-0 w-1/3 relative">
           <Image
@@ -41,9 +47,32 @@ export default async function SuccessPage({
           <div className="line-clamp-3 text-muted-foreground">
             {product.description}
           </div>
-          <Button className="mt-4" size="lg" asChild>{isSuccess ? <a></a> : <Link href={`/products/${product.id}/purchase`}>Try Again</Link>}</Button>
+          <Button className="mt-4" size="lg" asChild>
+            {isSuccess ? (
+              <a
+                href={`/products/download/${await createDownloadVerification(
+                  product.id
+                )}`}
+              >
+                Download
+              </a>
+            ) : (
+              <Link href={`/products/${product.id}/purchase`}>Try Again</Link>
+            )}
+          </Button>
         </div>
       </div>
     </div>
   );
+}
+
+async function createDownloadVerification(productId: string) {
+  return (
+    await db.downloadVerification.create({
+      data: {
+        productId,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      },
+    })
+  ).id
 }

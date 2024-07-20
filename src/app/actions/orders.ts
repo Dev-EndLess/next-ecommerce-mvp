@@ -1,4 +1,4 @@
-"user server";
+"use server";
 
 import db from "@/db/db";
 

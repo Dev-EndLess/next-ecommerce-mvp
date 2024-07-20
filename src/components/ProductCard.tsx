@@ -27,8 +27,8 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden">
-      <div className="relative w-full h-auto aspect-video">
-        <Image className="p-4" src={`/${imagePath}`} fill alt={name} />
+      <div className="relative w-full items-center h-auto aspect-video">
+        <Image src={`/${imagePath}`} alt={name} fill />
       </div>
       <CardHeader>
         <CardTitle>{name}</CardTitle>

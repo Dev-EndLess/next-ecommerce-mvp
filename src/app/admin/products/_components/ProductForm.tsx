@@ -82,9 +82,8 @@ export function ProductForm({ product }: { product?: Product | null }) {
         {product != null && (
           <Image
             src={`/${product.imagePath}`}
-            height="400"
-            width="400"
             alt={product.name}
+            fill
           />
         )}
         {error.image && <p className="text-destructive">{error.image}</p>}
