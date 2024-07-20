@@ -46,7 +46,7 @@ model Orders {
 
 model DownloadVerification {
   id String @id @default(uuid())
-  espiresAt DateTime
+  expiresAt DateTime
   createAt DateTime @default(now())
   productId String
   product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
