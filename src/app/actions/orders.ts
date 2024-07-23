@@ -2,9 +2,9 @@
 
 import db from "@/db/db";
 
-export async function userOrderExist(email: string, productId: string) {
+export async function userOrderExists(email: string, productId: string) {
   return (
-    (await db.orders.findFirst({
+    (await db.order.findFirst({
       where: { user: { email }, productId },
       select: { id: true },
     })) != null

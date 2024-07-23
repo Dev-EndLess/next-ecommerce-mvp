@@ -13,8 +13,8 @@ import React from "react";
 async function getUserData() {
   const [userCount, orderData] = await Promise.all([
     db.user.count(),
-    db.orders.aggregate({
-      _sum: { priceInCents: true },
+    db.order.aggregate({
+      _sum: { pricePaidInCents: true },
       _count: true,
     }),
   ]);
@@ -24,19 +24,19 @@ async function getUserData() {
     avarageValuePerUser:
       userCount === 0
         ? 0
-        : (orderData._sum.priceInCents || 0) / userCount / 100,
+        : (orderData._sum.pricePaidInCents || 0) / userCount / 100,
   };
 }
 
 // Get the number of sales and total amount of money earned
 async function getSalesData() {
-  const data = await db.orders.aggregate({
-    _sum: { priceInCents: true },
+  const data = await db.order.aggregate({
+    _sum: { pricePaidInCents: true },
     _count: true,
   });
 
   return {
-    amount: (data._sum.priceInCents || 0) / 100,
+    amount: (data._sum.pricePaidInCents || 0) / 100,
     numberOfSales: data._count,
   };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { userOrderExist } from "@/app/actions/orders";
+import { userOrderExists } from "@/app/actions/orders";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -91,7 +91,7 @@ function Form({
 
     setIsLoading(true);
 
-    const orderExists = await userOrderExist(email, productId);
+    const orderExists = await userOrderExists(email, productId);
 
     if (orderExists) {
       setErrorMessage(
